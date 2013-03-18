@@ -71,7 +71,10 @@ class Document implements \JsonSerializable
 
     public function getOriginalData()
     {
-        return $this->originalData;
+	if ($this->originalData) {
+            return $this->originalData;
+	}
+        return $this->data;
     }
 
     public function isDirty()
@@ -89,7 +92,7 @@ class Document implements \JsonSerializable
         if ($this->originalData) {
             return new self($this->originalData);
         } else {
-            return $this;
+            return new self($this->data);
         }
     }
 
@@ -144,6 +147,7 @@ class Document implements \JsonSerializable
             $this->isManaged = true;
             $mongoCollection->insert($data);
         }
+	$this->originalData = [];
     }
 
     private function fixPersistance(&$data)
