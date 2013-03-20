@@ -28,10 +28,20 @@ class Document implements \JsonSerializable
     public function __set($property, $value)
     {
         if ($this->isManaged) {
-            if (!$this->originalData) {
-                $this->originalData = $this->data;
+            if ($value != $this->data[$property]) {
+                if (array_key_exists($property, $this->originalData)) {
+                    if ($this->originalData[$property] == $value) {
+                        unset($this->originalData[$property]);
+                        if (empty($this->originalData)) {
+                            $this->isDirty = false;
+                        }
+                    }
+                }
+                else {
+                    $this->originalData[$property] = $this->data[$property];
+                    $this->isDirty = true;
+                }
             }
-            $this->isDirty = true;
         }
         $this->data[$property] = $value;
     }
@@ -39,7 +49,20 @@ class Document implements \JsonSerializable
     public function __unset($property)
     {
         if ($this->isManaged) {
-            $this->isDirty = true;
+            if (isset($this->data[$property])) {
+                if (array_key_exists($property, $this->originalData)) {
+                    if ($this->originalData[$property] === NULL){
+                        unset($this->originalData[$property]);
+                        if (empty($this->originalData)) {
+                            $this->isDirty = false;
+                        }
+                    }
+                }
+                else {
+                    $this->originalData[$property] = $this->data[$property];
+                    $this->isDirty = true;
+                }
+            }
         }
         unset($this->data[$property]);
     }
@@ -72,7 +95,7 @@ class Document implements \JsonSerializable
     public function getOriginalData()
     {
 	if ($this->originalData) {
-            return $this->originalData;
+            return array_merge($this->data, $this->originalData);
 	}
         return $this->data;
     }
@@ -90,7 +113,7 @@ class Document implements \JsonSerializable
     public function getOriginalCopy()
     {
         if ($this->originalData) {
-            return new self($this->originalData);
+            return new self( array_merge($this->data, $this->originalData) );
         } else {
             return new self($this->data);
         }
@@ -147,7 +170,7 @@ class Document implements \JsonSerializable
             $this->isManaged = true;
             $mongoCollection->insert($data);
         }
-	$this->originalData = [];
+        $this->originalData = [];
     }
 
     private function fixPersistance(&$data)

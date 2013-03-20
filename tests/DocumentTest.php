@@ -75,13 +75,13 @@ class DocumentTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($doc->baz, $savedData['baz']);
         $this->assertInstanceOf('stdClass', $doc->test);
 
-	$originalData1 = $doc->getOriginalData();
-	$doc->baz = 'test';
-	$originalData2 = $doc->getOriginalData();
-	$doc->save();
-	$originalData3 = $doc->getOriginalData();
-	$this->assertEquals($originalData1, $originalData2);
-	$this->assertEquals('test', $originalData3['baz']);	
+        $originalData1 = $doc->getOriginalData();
+        $doc->baz = 'test';
+        $originalData2 = $doc->getOriginalData();
+        $doc->save();
+        $originalData3 = $doc->getOriginalData();
+        $this->assertEquals($originalData1, $originalData2);
+        $this->assertEquals('test', $originalData3['baz']);
 
         try {
             $document2 = new Document;
@@ -123,6 +123,25 @@ class DocumentTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse($doc->isDirty());
 
+        $doc->foo = 'baz';
+
+        $this->assertFalse($doc->isDirty());
+
+        $doc->test = 'test';
+
+        $this->assertTrue($doc->isDirty());
+
+        unset($doc->test);
+
+        $this->assertFalse($doc->isDirty());
+
+        unset($doc->foo);
+
+        $this->assertTrue($doc->isDirty());
+
+        $doc->foo = 'baz';
+
+        $this->assertFalse($doc->isDirty());
     }
 
 
