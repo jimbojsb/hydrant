@@ -77,6 +77,11 @@ class Document implements \JsonSerializable
         $this->isManaged = $managed;
     }
 
+    public function setDirty($dirty) 
+    {
+        $this->isDirty = $dirty;
+    }
+
     public function setPersistenceType($persistenceType = null)
     {
         $this->persistenceType = $persistenceType ?: "stdClass";

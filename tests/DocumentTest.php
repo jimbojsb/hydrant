@@ -142,6 +142,15 @@ class DocumentTest extends PHPUnit_Framework_TestCase
         $doc->foo = 'baz';
 
         $this->assertFalse($doc->isDirty());
+        
+        $doc->setDirty(true);
+        
+        $this->assertTrue($doc->isDirty());
+        
+        $doc->setDirty(false);
+        
+        $this->assertFalse($doc->isDirty());
+
     }
 
 
